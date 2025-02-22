@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Meta>
+  <title>No Gain Exp Limit</title>
+  <id>omegaplatinum.elin.nogainexplimit</id>
+  <author>OmegaPlatinum</author>
+  <loadPriority>100</loadPriority>
+  <description>
+    Removes the experience gain limit when leveling up.
+    経験値の取得制限を削除します。
+
+    [h1] Features [/h1]
+    [list]
+    [*] By default, experience gain is capped at 1.5 levels per instance, but this mod removes that restriction, allowing unlimited experience accumulation.
+    [*] Removes the hard cap on experience gain per instance.
+    [*] Allows leveling up beyond the standard 1.5 level limit.
+    [*] Does not alter vanilla experience scaling or base experience calculations.
+    [/list]
+
+    [h1] Compatibility [/h1]
+    This mod works with existing save files.
+
+    Supports Game Version: 0.23.92
+
+    [h1] 注意 [/h1]
+    このMODは経験値倍率や基本経験値の値を変更するものではありません。
+
+    [h1] 特徴 [/h1]
+    [list]
+    [*] 通常、レベルアップ時の経験値取得は1.5レベル分までに制限されていますが、このMODではその制限を撤廃し、無制限に経験値を獲得できるようになります。
+    [*] 経験値取得の上限を撤廃し、無制限に取得可能にします。
+    [*] 1.5レベルの制限を超えてレベルアップが可能になります。
+    [*] バニラの経験値スケーリングや基本経験値計算は変更しません。
+    [/list]
+
+    [h1] 互換性 [/h1]
+    このMODは既存のセーブデータと完全に互換性があり、新しいプレイスルーは不要です。
+
+    対応ゲームバージョン: 0.23.92
+  </description>
+  <tags>General, Balance</tags>
+  <visibility>Public</visibility>
+  <version>0.23.92</version>
+</Meta>
