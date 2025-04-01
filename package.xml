@@ -14,12 +14,30 @@
     [*] Removes the hard cap on experience gain per instance.
     [*] Allows leveling up beyond the standard 1.5 level limit.
     [*] Does not alter vanilla experience scaling or base experience calculations.
+    [*] Optionally disable vanilla experience scaling, allowing all XP to be fully retained.
     [/list]
 
     [h1] Compatibility [/h1]
     This mod works with existing save files.
 
-    Supports Game Version: 0.23.92
+    [h1] Requirements [/h1]
+    This mod requires the [b]Mod Options[/b] mod only for accessing the Config menu. The core functionality of this mod will still work without it. Please subscribe to the [b]Mod Options[/b] mod for menu-based configuration:
+    [list]
+    [*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3381182341]https://steamcommunity.com/sharedfiles/filedetails/?id=3381182341[/url]
+    [/list]
+
+    [h1] Configuration Variables [/h1]
+
+    [h2] Enable Exp Scaling [/h2]
+    Enable or disable vanilla experience scaling.
+    If enabled, remaining XP after leveling up is divided by 2.
+    If disabled, all XP is fully retained after leveling up.
+    [code] Default: true [/code]
+
+    [h1] Configuration File Location [/h1]
+    [code] Steam\steamapps\common\Elin\BepInEx\config\omegaplatinum.elin.nogainexplimit.cfg [/code]
+
+    Supports Game Version: 0.23.109
 
     [h1] 注意 [/h1]
     このMODは経験値倍率や基本経験値の値を変更するものではありません。
@@ -30,14 +48,32 @@
     [*] 経験値取得の上限を撤廃し、無制限に取得可能にします。
     [*] 1.5レベルの制限を超えてレベルアップが可能になります。
     [*] バニラの経験値スケーリングや基本経験値計算は変更しません。
+    [*] オプションでバニラの経験値スケーリングを無効化し、すべてのXPを保持できるようにします。
     [/list]
 
     [h1] 互換性 [/h1]
     このMODは既存のセーブデータと完全に互換性があり、新しいプレイスルーは不要です。
 
-    対応ゲームバージョン: 0.23.92
+    [h1] 必須MOD [/h1]
+    このMODは [b]Mod Options[/b] MOD が必要です。ただし、Config メニューにアクセスするためだけです。主要な機能はこれなしでも動作します。[b]Mod Options[/b] MOD をサブスクライブするには、以下のリンクを参照してください：
+    [list]
+    [*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3381182341]https://steamcommunity.com/sharedfiles/filedetails/?id=3381182341[/url]
+    [/list]
+
+    [h1] 設定変数 [/h1]
+
+    [h2] Enable Exp Scaling [/h2]
+    バニラの経験値スケーリングの有効/無効を設定します。
+    有効にすると、レベルアップ後の残り経験値が 2 で割られます。
+    無効にすると、すべての経験値が保持され、より多くのレベルアップが可能になります。
+    [code] デフォルト: true [/code]
+
+    [h1] 設定ファイルの場所 [/h1]
+    [code] Steam\steamapps\common\Elin\BepInEx\config\omegaplatinum.elin.nogainexplimit.cfg [/code]
+
+    対応ゲームバージョン: 0.23.109
   </description>
-  <tags>General, Balance</tags>
+  <tags>General, Balance, QoL</tags>
   <visibility>Public</visibility>
-  <version>0.23.92</version>
+  <version>0.23.109</version>
 </Meta>

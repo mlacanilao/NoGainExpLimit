@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ConfigLayoutSchema.xsd">
+    <hlayout id="hlayout01">
+        <vlayout id="vlayout01" border="true">
+            <title>title01</title>
+            
+            <toggle id="enableExpScalingToggle">
+                <contentId>toggle01</contentId>
+                <tooltip>tooltip01</tooltip>
+            </toggle>
+        </vlayout>
+    </hlayout>
+</config>
