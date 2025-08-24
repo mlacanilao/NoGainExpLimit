@@ -7,7 +7,7 @@ namespace NoGainExpLimit
     {
         [HarmonyPostfix]
         [HarmonyPatch(declaringType: typeof(ElementContainer), methodName: nameof(ElementContainer.ModExp))]
-        internal static void ElementContainerModExpPostfix(ElementContainer __instance, int ele, int a, bool chain)
+        internal static void ElementContainerModExpPostfix(ElementContainer __instance, int ele, float a, bool chain)
         {
             ElementContainerPatch.ModExpPostfix(__instance: __instance, ele: ele, a: a, chain: chain);
         }

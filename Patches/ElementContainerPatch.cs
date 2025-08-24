@@ -12,6 +12,8 @@ namespace NoGainExpLimit
             var codeMatcher = new CodeMatcher(instructions: instructions);
 
             bool enableExpScaling = NoGainExpLimitConfig.EnableExpScaling?.Value ?? true;
+            
+            NoGainExpLimit.Log(payload: $"enableExpScaling: {enableExpScaling}");
 
             if (enableExpScaling == true)
             {
@@ -24,6 +26,8 @@ namespace NoGainExpLimit
                     new CodeMatch(opcode: OpCodes.Div),            // Divide ExpToNext by 2
                     new CodeMatch(opcode: OpCodes.Call, operand: typeof(Mathf).GetMethod(name: "Clamp", types: new[] { typeof(int), typeof(int), typeof(int) })), // Mathf.Clamp call
                 });
+                
+                NoGainExpLimit.Log(payload: $"codeMatcher.IsValid: {codeMatcher.IsValid}");
             
                 if (codeMatcher.IsValid)
                 {
@@ -45,6 +49,8 @@ namespace NoGainExpLimit
                     new CodeMatch(opcode: OpCodes.Call, operand: typeof(Mathf).GetMethod(name: "Clamp", types: new[] { typeof(int), typeof(int), typeof(int) })) // Mathf.Clamp()
                 });
                 
+                NoGainExpLimit.Log(payload: $"codeMatcher.IsValid: {codeMatcher.IsValid}");
+                
                 if (codeMatcher.IsValid)
                 {
                     codeMatcher.RemoveInstructions(count: 8);
@@ -54,7 +60,7 @@ namespace NoGainExpLimit
             return codeMatcher.Instructions();
         }
         
-        internal static void ModExpPostfix(ElementContainer __instance, int ele, int a, bool chain)
+        internal static void ModExpPostfix(ElementContainer __instance, int ele, float a, bool chain)
         {
             Element element = __instance.GetElement(id: ele);
             

@@ -37,7 +37,7 @@
     [h1] Configuration File Location [/h1]
     [code] Steam\steamapps\common\Elin\BepInEx\config\omegaplatinum.elin.nogainexplimit.cfg [/code]
 
-    Supports Game Version: 0.23.109
+    Supports Game Version: EA 23.187 Stable
 
     [h1] 注意 [/h1]
     このMODは経験値倍率や基本経験値の値を変更するものではありません。
@@ -71,9 +71,9 @@
     [h1] 設定ファイルの場所 [/h1]
     [code] Steam\steamapps\common\Elin\BepInEx\config\omegaplatinum.elin.nogainexplimit.cfg [/code]
 
-    対応ゲームバージョン: 0.23.109
+    対応ゲームバージョン: EA 23.187 Stable
   </description>
   <tags>General, Balance, QoL</tags>
   <visibility>Public</visibility>
-  <version>0.23.109</version>
+  <version>0.23.187</version>
 </Meta>

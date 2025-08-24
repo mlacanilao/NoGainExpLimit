@@ -9,7 +9,7 @@ namespace NoGainExpLimit
     {
         internal const string Guid = "omegaplatinum.elin.nogainexplimit";
         internal const string Name = "No Gain Exp Limit";
-        internal const string Version = "1.1.0.1";
+        internal const string Version = "1.1.1.0";
         internal const string ModOptionsGuid = "evilmask.elinplugins.modoptions";
         internal const string ModOptionsAssemblyName = "ModOptions";
     }
