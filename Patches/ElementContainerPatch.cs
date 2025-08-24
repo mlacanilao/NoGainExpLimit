@@ -13,8 +13,6 @@ namespace NoGainExpLimit
 
             bool enableExpScaling = NoGainExpLimitConfig.EnableExpScaling?.Value ?? true;
             
-            NoGainExpLimit.Log(payload: $"enableExpScaling: {enableExpScaling}");
-
             if (enableExpScaling == true)
             {
                 codeMatcher.MatchStartForward(matches: new[]
@@ -27,8 +25,6 @@ namespace NoGainExpLimit
                     new CodeMatch(opcode: OpCodes.Call, operand: typeof(Mathf).GetMethod(name: "Clamp", types: new[] { typeof(int), typeof(int), typeof(int) })), // Mathf.Clamp call
                 });
                 
-                NoGainExpLimit.Log(payload: $"codeMatcher.IsValid: {codeMatcher.IsValid}");
-            
                 if (codeMatcher.IsValid)
                 {
                     codeMatcher.RemoveInstructions(count: 6);
@@ -48,8 +44,6 @@ namespace NoGainExpLimit
                     new CodeMatch(opcode: OpCodes.Div),       // Divide operation
                     new CodeMatch(opcode: OpCodes.Call, operand: typeof(Mathf).GetMethod(name: "Clamp", types: new[] { typeof(int), typeof(int), typeof(int) })) // Mathf.Clamp()
                 });
-                
-                NoGainExpLimit.Log(payload: $"codeMatcher.IsValid: {codeMatcher.IsValid}");
                 
                 if (codeMatcher.IsValid)
                 {
