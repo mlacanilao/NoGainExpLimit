@@ -8,6 +8,11 @@
                 <contentId>toggle01</contentId>
                 <tooltip>tooltip01</tooltip>
             </toggle>
+
+            <toggle id="enableOptimizationToggle">
+                <contentId>toggle02</contentId>
+                <tooltip>tooltip02</tooltip>
+            </toggle>
         </vlayout>
     </hlayout>
 </config>

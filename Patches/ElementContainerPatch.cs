@@ -57,15 +57,70 @@ namespace NoGainExpLimit
         internal static void ModExpPostfix(ElementContainer __instance, int ele, float a, bool chain)
         {
             Element element = __instance.GetElement(id: ele);
-            
+
             if (element == null || !element.CanGainExp)
             {
                 return;
             }
-            
-            if (element.vExp >= element.ExpToNext)
+
+            bool enableOptimization = NoGainExpLimitConfig.EnableOptimization?.Value ?? false;
+
+            if (enableOptimization == false)
             {
-                __instance.ModExp(ele: element.id, a: 1, chain: chain);
+                if (element.vExp >= element.ExpToNext)
+                {
+                    __instance.ModExp(ele: element.id, a: 1, chain: chain);
+                }
+
+                return;
+            }
+
+            bool enableExpScaling = NoGainExpLimitConfig.EnableExpScaling?.Value ?? true;
+
+            int originalBase = element.vBase;
+            int totalLevelsGained = 0;
+
+            while (element.vExp >= element.ExpToNext)
+            {
+                int leftover = element.vExp - element.ExpToNext;
+
+                __instance.ModBase(ele: ele, v: 1);
+                totalLevelsGained += 1;
+
+                if (enableExpScaling == true)
+                {
+                    int scaled = leftover / 2;
+                    int max = element.ExpToNext / 2;
+                    element.vExp = Mathf.Clamp(value: scaled, min: 0, max: max);
+                }
+                else
+                {
+                    element.vExp = leftover;
+                }
+
+                if (element.vTempPotential > 0)
+                {
+                    element.vTempPotential -= element.vTempPotential / 4 + EClass.rnd(a: 5) + 5;
+                    if (element.vTempPotential < 0)
+                    {
+                        element.vTempPotential = 0;
+                        break;
+                    }
+                }
+                else if (element.vTempPotential < 0)
+                {
+                    element.vTempPotential += -element.vTempPotential / 4 + EClass.rnd(a: 5) + 5;
+                    if (element.vTempPotential > 0)
+                    {
+                        element.vTempPotential = 0;
+                        break;
+                    }
+                }
+            }
+
+            if (totalLevelsGained > 0)
+            {
+                __instance.OnLevelUp(e: element, lastValue: originalBase);
             }
         }
     }

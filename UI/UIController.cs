@@ -49,6 +49,13 @@ namespace NoGainExpLimit
                 {
                     NoGainExpLimitConfig.EnableExpScaling.Value = isChecked;
                 };
+                
+                var enableOptimizationToggle = builder.GetPreBuild<OptToggle>(id: "enableOptimizationToggle");
+                enableOptimizationToggle.Checked = NoGainExpLimitConfig.EnableOptimization.Value;
+                enableOptimizationToggle.OnValueChanged += isChecked =>
+                {
+                    NoGainExpLimitConfig.EnableOptimization.Value = isChecked;
+                };
             };
         }
     }
