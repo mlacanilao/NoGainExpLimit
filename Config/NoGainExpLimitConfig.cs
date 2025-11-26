@@ -31,14 +31,13 @@ namespace NoGainExpLimit
                 section: ModInfo.Name,
                 key: "Enable Optimization (Experimental)",
                 defaultValue: false,
-                description: "When enabled, extra levels from massive EXP gains are optimized and processed differently from vanilla behavior.\n" +
-                             "This can significantly reduce lag when gaining very large EXP amounts, but some leftover EXP will be lost during processing.\n" +
-                             "有効にすると、大量の経験値を一度に獲得した際に、追加のレベルアップ処理が最適化され、バニラとは異なる挙動になります。\n" +
-                             "ラグを大幅に軽減できますが、一部の残り経験値が処理中に失われる場合があります。\n" +
-                             "启用后，大量经验一次性获取时会使用优化的升级处理方式，与原版行为不同。\n" +
-                             "可以显著减少卡顿，不过在此过程中可能会损失少量剩余经验值。"
+                description: "When enabled, large EXP gains are processed using an optimized batch-leveling method.\n" +
+                             "This produces results close to leveling one step at a time while greatly reducing lag during massive EXP gains.\n" +
+                             "有効にすると、大量の経験値獲得を段階的に処理する最適化方式が適用されます。\n" +
+                             "手動で1レベルずつ上げる場合に近い結果となり、処理の重さを大幅に軽減できます。\n" +
+                             "启用后，大量经验将按逐级最佳方式进行优化处理。\n" +
+                             "结果接近手动逐级升级，并可显著减轻卡顿。"
             );
-
         }
         
         public static void InitializeXmlPath(string xmlPath)

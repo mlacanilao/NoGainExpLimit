@@ -15,7 +15,7 @@
     [*] Allows leveling up beyond the standard 1.5 level limit.
     [*] Does not alter vanilla experience scaling or base experience calculations.
     [*] Optionally disable vanilla experience scaling, allowing all XP to be fully retained.
-    [*] Optional optimization mode for very large EXP gains that batches extra level ups to reduce lag, at the cost of some leftover EXP being discarded.
+    [*] Optional optimization mode for very large EXP gains that batches extra level ups to reduce lag while closely matching step-by-step leveling results.
     [/list]
 
     [h1] Compatibility [/h1]
@@ -36,8 +36,8 @@
     [code] Default: true [/code]
 
     [h2] Enable Optimization (Experimental) [/h2]
-    When enabled, extra levels from very large EXP gains are processed with an optimized loop that is not vanilla behavior.
-    This can significantly reduce lag when gaining huge amounts of EXP, but some leftover EXP may be lost during processing.
+    When enabled, large EXP gains are processed using an optimized batch-leveling method.
+    This produces results close to leveling one step at a time while greatly reducing lag during massive EXP gains.
     [code] Default: false [/code]
 
     [h1] Configuration File Location [/h1]
@@ -55,7 +55,7 @@
     [*] 1.5レベルの制限を超えてレベルアップが可能になります。
     [*] バニラの経験値スケーリングや基本経験値計算は変更しません。
     [*] オプションでバニラの経験値スケーリングを無効化し、すべてのXPを保持できるようにします。
-    [*] 大量の経験値を一度に獲得した際にレベルアップ処理をまとめて行う最適化モードを任意で有効化でき、ラグを大きく軽減できる一方で余った経験値の一部が破棄される場合があります。
+    [*] 大量の経験値を一度に獲得した際にレベルアップ処理をまとめて最適化し、手動で段階的にレベルを上げる場合に近い結果でラグを大きく軽減します。
     [/list]
 
     [h1] 互換性 [/h1]
@@ -76,8 +76,8 @@
     [code] デフォルト: true [/code]
 
     [h2] Enable Optimization (Experimental) [/h2]
-    有効にすると、大量の経験値を一度に獲得した際に追加のレベルアップ処理が最適化され、バニラとは異なる挙動になります。
-    ラグを大きく軽減できますが、処理の過程で余った経験値の一部が失われる場合があります。
+    有効にすると、大量の経験値獲得を段階的に処理する最適化方式が適用されます。
+    手動で1レベルずつ上げる場合に近い結果となり、処理の重さを大幅に軽減できます。
     [code] デフォルト: false [/code]
 
     [h1] 設定ファイルの場所 [/h1]

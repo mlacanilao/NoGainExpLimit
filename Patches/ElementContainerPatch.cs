@@ -64,65 +64,77 @@ namespace NoGainExpLimit
             }
 
             bool enableOptimization = NoGainExpLimitConfig.EnableOptimization?.Value ?? false;
-            
+
             if (enableOptimization == false)
             {
                 if (element.vExp >= element.ExpToNext)
                 {
-                    int remaining1 = element.vExp;
-                    element.vExp = 0;
-                    __instance.ModExp(ele: ele, a: remaining1, chain: chain);
+                    float factor = 1f;
+
+                    if (element.UseExpMod)
+                    {
+                        int potential = element.UsePotential ? element.Potential : 100;
+                        int clampedPotential = Mathf.Clamp(value: potential, min: 10, max: 1000);
+                        int denom = 100 + Mathf.Max(a: 0, b: element.ValueWithoutLink) * 25;
+                        factor = (float)clampedPotential / denom;
+                    }
+
+                    int rawForOneLevel = Mathf.CeilToInt(f: element.ExpToNext / factor);
+                    int bank = Mathf.Min(a: element.vExp, b: rawForOneLevel);
+                    int remaining1 = element.vExp - bank;
+                    element.vExp = bank;
+
+                    if (remaining1 > 0)
+                    {
+                        __instance.ModExp(ele: ele, a: remaining1, chain: chain);
+                    }
                 }
 
                 return;
             }
-            
+
             bool enableExpScaling = NoGainExpLimitConfig.EnableExpScaling?.Value ?? true;
-            
+
             int originalBase = element.vBase;
             int totalLevelsGained = 0;
-            
+
             int remaining2 = element.vExp;
             element.vExp = 0;
 
-            while (remaining2 >= element.ExpToNext)
+            while (remaining2 > 0)
             {
-                float localA = remaining2;
+                int expToNext = element.ExpToNext;
+                int potential = element.UsePotential ? element.Potential : 100;
+                int clampedPotential = Mathf.Clamp(value: potential, min: 10, max: 1000);
+                int denom = 100 + Mathf.Max(a: 0, b: element.ValueWithoutLink) * 25;
+                int rawForOneLevel = Mathf.CeilToInt(f: (float)expToNext * denom / clampedPotential);
 
-                if (element.UseExpMod)
+                if (remaining2 < rawForOneLevel)
                 {
-                    int potential = element.UsePotential ? element.Potential : 100;
-                    int clampedPotential = Mathf.Clamp(value: potential, min: 10, max: 1000);
-                    int denom = 100 + Mathf.Max(a: 0, b: element.ValueWithoutLink) * 25;
+                    float localA = remaining2;
 
-                    localA = localA * clampedPotential / denom;
-
-                    if (EClass.rndf(a: 1f) < localA % 1f)
+                    if (element.UseExpMod)
                     {
-                        localA += 1f;
+                        localA = localA * clampedPotential / denom;
+
+                        if (EClass.rndf(a: 1f) < localA % 1f)
+                        {
+                            localA += 1f;
+                        }
                     }
-                }
 
-                int gain = Mathf.FloorToInt(f: localA);
-
-                if (gain < element.ExpToNext)
-                {
-                    element.vExp = gain;
+                    int gain = Mathf.FloorToInt(f: localA);
+                    element.vExp = Mathf.Min(a: gain, b: expToNext - 1);
                     break;
                 }
 
-                int leftover = gain - element.ExpToNext;
-
+                remaining2 -= rawForOneLevel;
                 __instance.ModBase(ele: ele, v: 1);
                 totalLevelsGained += 1;
 
-                if (enableExpScaling == true)
+                if (enableExpScaling == true && remaining2 > 0)
                 {
-                    remaining2 = leftover / 2;
-                }
-                else
-                {
-                    remaining2 = leftover;
+                    remaining2 /= 2;
                 }
 
                 if (element.vTempPotential > 0)
@@ -143,11 +155,6 @@ namespace NoGainExpLimit
                         break;
                     }
                 }
-            }
-
-            if (element.vExp == 0 && remaining2 > 0 && remaining2 < element.ExpToNext)
-            {
-                element.vExp = remaining2;
             }
 
             if (totalLevelsGained > 0)
