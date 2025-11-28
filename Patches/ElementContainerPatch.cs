@@ -53,7 +53,7 @@ namespace NoGainExpLimit
             
             return codeMatcher.Instructions();
         }
-        
+
         internal static void ModExpPostfix(ElementContainer __instance, int ele, float a, bool chain)
         {
             Element element = __instance.GetElement(id: ele);
@@ -69,24 +69,18 @@ namespace NoGainExpLimit
             {
                 if (element.vExp >= element.ExpToNext)
                 {
-                    float factor = 1f;
+                    int expToNext = element.ExpToNext;
+                    int rawForOneLevel = GetRawForOneLevel(element: element, expToNext: expToNext);
 
-                    if (element.UseExpMod)
-                    {
-                        int potential = element.UsePotential ? element.Potential : 100;
-                        int clampedPotential = Mathf.Clamp(value: potential, min: 10, max: 1000);
-                        int denom = 100 + Mathf.Max(a: 0, b: element.ValueWithoutLink) * 25;
-                        factor = (float)clampedPotential / denom;
-                    }
-
-                    int rawForOneLevel = Mathf.CeilToInt(f: element.ExpToNext / factor);
                     int bank = Mathf.Min(a: element.vExp, b: rawForOneLevel);
-                    int remaining1 = element.vExp - bank;
-                    element.vExp = bank;
+                    int remainingRaw = element.vExp - bank;
 
-                    if (remaining1 > 0)
+                    element.vExp = remainingRaw;
+
+                    if (bank > 0)
                     {
-                        __instance.ModExp(ele: ele, a: remaining1, chain: chain);
+                        float nextA = bank;
+                        __instance.ModExp(ele: ele, a: nextA, chain: chain);
                     }
                 }
 
@@ -104,10 +98,7 @@ namespace NoGainExpLimit
             while (remaining2 > 0)
             {
                 int expToNext = element.ExpToNext;
-                int potential = element.UsePotential ? element.Potential : 100;
-                int clampedPotential = Mathf.Clamp(value: potential, min: 10, max: 1000);
-                int denom = 100 + Mathf.Max(a: 0, b: element.ValueWithoutLink) * 25;
-                int rawForOneLevel = Mathf.CeilToInt(f: (float)expToNext * denom / clampedPotential);
+                int rawForOneLevel = GetRawForOneLevel(element: element, expToNext: expToNext);
 
                 if (remaining2 < rawForOneLevel)
                 {
@@ -115,6 +106,10 @@ namespace NoGainExpLimit
 
                     if (element.UseExpMod)
                     {
+                        int potential = element.UsePotential ? element.Potential : 100;
+                        int clampedPotential = Mathf.Clamp(value: potential, min: 10, max: 1000);
+                        int denom = 100 + Mathf.Max(a: 0, b: element.ValueWithoutLink) * 25;
+
                         localA = localA * clampedPotential / denom;
 
                         if (EClass.rndf(a: 1f) < localA % 1f)
@@ -161,6 +156,20 @@ namespace NoGainExpLimit
             {
                 __instance.OnLevelUp(e: element, lastValue: originalBase);
             }
+        }
+        
+        private static int GetRawForOneLevel(Element element, int expToNext)
+        {
+            int potential = element.UsePotential ? element.Potential : 100;
+            int clampedPotential = Mathf.Clamp(value: potential, min: 10, max: 1000);
+            int denom = 100 + Mathf.Max(a: 0, b: element.ValueWithoutLink) * 25;
+
+            if (element.UseExpMod)
+            {
+                return Mathf.CeilToInt(f: (float)expToNext * denom / clampedPotential);
+            }
+
+            return expToNext;
         }
     }
 }
