@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Meta>
+  <title>No Gain Exp Limit</title>
+  <id>omegaplatinum.elin.nogainexplimit</id>
+  <author>OmegaPlatinum</author>
+  <loadPriority>100</loadPriority>
+  <description>
+    Removes the experience gain limit when leveling up.
+    経験値の取得制限を削除します。
+
+    [h1] Features [/h1]
+    [list]
+    [*] By default, experience gain is capped at 1.5 levels per action, but this mod removes that restriction, allowing unlimited experience accumulation.
+    [*] Removes the hard cap on experience gain per action.
+    [*] Allows leveling up beyond the standard 1.5 level limit.
+    [*] Processes large EXP gains level by level so one large gain can more closely match repeated smaller gains.
+    [*] Enable Vanilla Overflow Reduction to greatly reduce repeated multi-level gains from very large EXP gains in a single action and make the result feel fairer and closer to vanilla pacing.
+    [*] For very large EXP gains in a single action, it is strongly recommended to enable both Enable Optimization (Experimental) and Enable Level-Up Presentation Suppression together.
+    [*] Optimization helps heavy chained level-up processing stay more stable, while presentation suppression reduces sound and message spam during repeated level-ups.
+    [/list]
+
+    [h1] Compatibility [/h1]
+    This mod works with existing save files.
+
+    [h1] Requirements [/h1]
+    This mod requires the [b]Mod Options[/b] mod only for accessing the Config menu. The core functionality of this mod will still work without it. Please subscribe to the [b]Mod Options[/b] mod for menu-based configuration:
+    [list]
+    [*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3381182341]https://steamcommunity.com/sharedfiles/filedetails/?id=3381182341[/url]
+    [/list]
+
+    [h1] Configuration Variables [/h1]
+
+    [h2] Enable Vanilla Overflow Reduction [/h2]
+    Controls whether the current continuation step halves remaining raw EXP after each level-up.
+    If enabled, the remaining raw EXP is divided by 2 before the next continuation step.
+    This greatly reduces repeated multi-level gains from very large EXP gains in a single action and usually feels fairer and closer to vanilla pacing.
+    If disabled, the remaining raw EXP is kept in full for the next continuation step, allowing much larger chained level gains per action.
+    This is the mod's current raw-overflow behavior and is not the same as vanilla's actual adjusted-overflow handling.
+    [code] Default: true [/code]
+
+    [h2] Enable Optimization (Experimental) [/h2]
+    When enabled, very large EXP gains are handled in a more stable way to help avoid crashes during massive chained level-ups.
+    For very large EXP gains in a single action, it is strongly recommended to enable this together with Enable Level-Up Presentation Suppression.
+    [code] Default: false [/code]
+
+    [h2] Enable Level-Up Presentation Suppression [/h2]
+    When enabled, extra level-ups from large EXP gains hide level-up sounds and messages to reduce spam and lag.
+    Actual level-up effects still run normally.
+    For very large EXP gains in a single action, it is strongly recommended to enable this together with Enable Optimization (Experimental).
+    [code] Default: false [/code]
+
+    [h1] Configuration File Location [/h1]
+    [code] Steam\steamapps\common\Elin\BepInEx\config\omegaplatinum.elin.nogainexplimit.cfg [/code]
+
+    [img] https://img.shields.io/badge/Supports%20Game%20Version-EA%2023.287%20Stable-green [/img]
+
+    [h1] 注意 [/h1]
+    このMODは経験値倍率や基本経験値の値を変更するものではありません。
+
+    [h1] 特徴 [/h1]
+    [list]
+    [*] 通常、レベルアップ時の経験値取得は1.5レベル分までに制限されていますが、このMODではその制限を撤廃し、無制限に経験値を獲得できるようになります。
+    [*] 1回あたりの経験値取得上限を撤廃します。
+    [*] 通常の1.5レベル制限を超えてレベルアップできます。
+    [*] 大量のEXP獲得をレベルごとに処理し、1回の大きな獲得結果が小分けの連続獲得により近くなるようにします。
+    [*] Enable Vanilla Overflow Reduction を有効にすると、1回の行動で非常に大きなEXPを得た際の連続レベルアップ数を大きく減らし、体感としてより公平でバニラ寄りになりやすくなります。
+    [*] 1回の行動で非常に大きなEXPを得る場合は、Enable Optimization (Experimental) と Enable Level-Up Presentation Suppression を一緒に有効にすることを強く推奨します。
+    [*] 最適化は大量の連続レベルアップ処理をより安定させ、表示抑制は連続レベルアップ時の音やメッセージの多さを軽減します。
+    [/list]
+
+    [h1] 互換性 [/h1]
+    このMODは既存のセーブデータと互換性があります。
+
+    [h1] 必須MOD [/h1]
+    このMODで [b]Mod Options[/b] MOD が必要なのは Config メニューへアクセスする場合だけです。主要な機能はこれがなくても動作します。メニューから設定したい場合は、以下の [b]Mod Options[/b] MOD を利用してください。
+    [list]
+    [*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3381182341]https://steamcommunity.com/sharedfiles/filedetails/?id=3381182341[/url]
+    [/list]
+
+    [h1] 設定変数 [/h1]
+
+    [h2] Enable Vanilla Overflow Reduction [/h2]
+    各レベルアップ後の継続処理で、残っている生EXPを半分にするかどうかを設定します。
+    有効にすると、次の継続ステップへ進む前に残りの生EXPが2で割られます。
+    これにより、1回の行動で非常に大きなEXPを得た際の連続レベルアップ数を大きく減らし、体感としてはより公平でバニラ寄りになりやすくなります。
+    無効にすると、次の継続ステップへ残りの生EXPがそのまま引き継がれ、1回の行動でより大きな連続レベルアップが発生します。
+    これは現在のMOD側の生EXPベース挙動であり、バニラ本来の調整済みオーバーフロー処理とは同一ではありません。
+    [code] デフォルト: true [/code]
+
+    [h2] Enable Optimization (Experimental) [/h2]
+    有効にすると、非常に大きなEXP獲得時の連続レベルアップ処理をより安定させ、極端なケースでのクラッシュ回避に役立ちます。
+    1回の行動で非常に大きなEXPを得る場合は、Enable Level-Up Presentation Suppression と一緒に有効にすることを強く推奨します。
+    [code] デフォルト: false [/code]
+
+    [h2] Enable Level-Up Presentation Suppression [/h2]
+    有効にすると、大量のEXP獲得で発生する追加の連続レベルアップ時に、レベルアップ音やメッセージを非表示にして表示負荷やラグを軽減します。
+    実際のレベルアップ効果は通常どおり適用されます。
+    1回の行動で非常に大きなEXPを得る場合は、Enable Optimization (Experimental) と一緒に有効にすることを強く推奨します。
+    [code] デフォルト: false [/code]
+
+    [h1] 設定ファイルの場所 [/h1]
+    [code] Steam\steamapps\common\Elin\BepInEx\config\omegaplatinum.elin.nogainexplimit.cfg [/code]
+
+    [img] https://img.shields.io/badge/対応ゲームバージョン-EA%2023.287%20Stable-green [/img]
+  </description>
+  <tags>General, Balance, QoL</tags>
+  <visibility>Public</visibility>
+  <version>0.23.287</version>
+</Meta>

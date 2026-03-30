@@ -1,62 +1,59 @@
 using System.IO;
 using System.Reflection;
-using BepInEx;
 using EvilMask.Elin.ModOptions;
 using EvilMask.Elin.ModOptions.UI;
 
-namespace NoGainExpLimit
+namespace NoGainExpLimit;
+
+public static class UIController
 {
-    public class UIController
+    public static void RegisterUI()
     {
-        public static void RegisterUI()
+        var controller = ModOptionController.Register(guid: ModInfo.Guid, tooptipId: "mod.tooltip");
+        var assemblyLocation = Path.GetDirectoryName(path: Assembly.GetExecutingAssembly().Location) ?? string.Empty;
+        var xmlPath = Path.Combine(path1: assemblyLocation, path2: "NoGainExpLimitConfig.xml");
+        var xlsxPath = Path.Combine(path1: assemblyLocation, path2: "translations.xlsx");
+
+        NoGainExpLimitConfig.InitializeXmlPath(xmlPath: xmlPath);
+        NoGainExpLimitConfig.InitializeTranslationXlsxPath(xlsxPath: xlsxPath);
+
+        if (File.Exists(path: NoGainExpLimitConfig.XmlPath))
         {
-            foreach (var obj in ModManager.ListPluginObject)
-            {
-                if (obj is BaseUnityPlugin plugin && plugin.Info.Metadata.GUID == ModInfo.ModOptionsGuid)
-                {
-                    var controller = ModOptionController.Register(guid: ModInfo.Guid, tooptipId: "mod.tooltip");
-                    
-                    var assemblyLocation = Path.GetDirectoryName(path: Assembly.GetExecutingAssembly().Location);
-                    var xmlPath = Path.Combine(path1: assemblyLocation, path2: "NoGainExpLimitConfig.xml");
-                    NoGainExpLimitConfig.InitializeXmlPath(xmlPath: xmlPath);
-            
-                    var xlsxPath = Path.Combine(path1: assemblyLocation, path2: "translations.xlsx");
-                    NoGainExpLimitConfig.InitializeTranslationXlsxPath(xlsxPath: xlsxPath);
-                    
-                    if (File.Exists(path: NoGainExpLimitConfig.XmlPath))
-                    {
-                        using (StreamReader sr = new StreamReader(path: NoGainExpLimitConfig.XmlPath))
-                            controller.SetPreBuildWithXml(xml: sr.ReadToEnd());
-                    }
-                    
-                    if (File.Exists(path: NoGainExpLimitConfig.TranslationXlsxPath))
-                    {
-                        controller.SetTranslationsFromXslx(path: NoGainExpLimitConfig.TranslationXlsxPath);
-                    }
-                    
-                    RegisterEvents(controller: controller);
-                }
-            }
+            controller.SetPreBuildWithXml(xml: File.ReadAllText(path: NoGainExpLimitConfig.XmlPath));
         }
 
-        private static void RegisterEvents(ModOptionController controller)
+        if (File.Exists(path: NoGainExpLimitConfig.TranslationXlsxPath))
         {
-            controller.OnBuildUI += builder =>
-            {
-                var enableExpScalingToggle = builder.GetPreBuild<OptToggle>(id: "enableExpScalingToggle");
-                enableExpScalingToggle.Checked = NoGainExpLimitConfig.EnableExpScaling.Value;
-                enableExpScalingToggle.OnValueChanged += isChecked =>
-                {
-                    NoGainExpLimitConfig.EnableExpScaling.Value = isChecked;
-                };
-                
-                var enableOptimizationToggle = builder.GetPreBuild<OptToggle>(id: "enableOptimizationToggle");
-                enableOptimizationToggle.Checked = NoGainExpLimitConfig.EnableOptimization.Value;
-                enableOptimizationToggle.OnValueChanged += isChecked =>
-                {
-                    NoGainExpLimitConfig.EnableOptimization.Value = isChecked;
-                };
-            };
+            controller.SetTranslationsFromXslx(path: NoGainExpLimitConfig.TranslationXlsxPath);
         }
+
+        RegisterEvents(controller: controller);
+    }
+
+    private static void RegisterEvents(ModOptionController controller)
+    {
+        controller.OnBuildUI += builder =>
+        {
+            var enableVanillaOverflowReductionToggle = builder.GetPreBuild<OptToggle>(id: "enableVanillaOverflowReductionToggle");
+            enableVanillaOverflowReductionToggle.Checked = NoGainExpLimitConfig.EnableVanillaOverflowReduction.Value;
+            enableVanillaOverflowReductionToggle.OnValueChanged += isChecked =>
+            {
+                NoGainExpLimitConfig.EnableVanillaOverflowReduction.Value = isChecked;
+            };
+            
+            var enableOptimizationToggle = builder.GetPreBuild<OptToggle>(id: "enableOptimizationToggle");
+            enableOptimizationToggle.Checked = NoGainExpLimitConfig.EnableOptimization.Value;
+            enableOptimizationToggle.OnValueChanged += isChecked =>
+            {
+                NoGainExpLimitConfig.EnableOptimization.Value = isChecked;
+            };
+            
+            var enableLevelUpPresentationSuppressionToggle = builder.GetPreBuild<OptToggle>(id: "enableLevelUpPresentationSuppressionToggle");
+            enableLevelUpPresentationSuppressionToggle.Checked = NoGainExpLimitConfig.EnableLevelUpPresentationSuppression.Value;
+            enableLevelUpPresentationSuppressionToggle.OnValueChanged += isChecked =>
+            {
+                NoGainExpLimitConfig.EnableLevelUpPresentationSuppression.Value = isChecked;
+            };
+        };
     }
 }

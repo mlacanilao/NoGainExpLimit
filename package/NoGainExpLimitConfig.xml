@@ -4,7 +4,7 @@
         <vlayout id="vlayout01" border="true">
             <title>title01</title>
             
-            <toggle id="enableExpScalingToggle">
+            <toggle id="enableVanillaOverflowReductionToggle">
                 <contentId>toggle01</contentId>
                 <tooltip>tooltip01</tooltip>
             </toggle>
@@ -12,6 +12,11 @@
             <toggle id="enableOptimizationToggle">
                 <contentId>toggle02</contentId>
                 <tooltip>tooltip02</tooltip>
+            </toggle>
+
+            <toggle id="enableLevelUpPresentationSuppressionToggle">
+                <contentId>toggle03</contentId>
+                <tooltip>tooltip03</tooltip>
             </toggle>
         </vlayout>
     </hlayout>

@@ -1,175 +1,336 @@
+using System;
 using System.Collections.Generic;
-using System.Reflection.Emit;
-using HarmonyLib;
 using UnityEngine;
 
-namespace NoGainExpLimit
+namespace NoGainExpLimit;
+
+internal static class ElementContainerPatch
 {
-    internal static class ElementContainerPatch
+    internal sealed class ModExpState
     {
-        internal static IEnumerable<CodeInstruction> ModExpTranspiler(IEnumerable<CodeInstruction> instructions)
+        internal float RemainingRaw { get; set; }
+        internal bool EnteredPresentationSuppressionScope { get; set; }
+    }
+
+    internal sealed class ContinuationLoopContext
+    {
+        internal ElementContainer Container { get; set; } = null!;
+        internal int ElementId { get; set; }
+        internal bool Chain { get; set; }
+        internal float PendingRaw { get; set; }
+        internal bool HasPending { get; set; }
+    }
+
+    [ThreadStatic]
+    private static int presentationSuppressionScopeDepth;
+
+    [ThreadStatic]
+    private static int onLevelUpDepth;
+
+    [ThreadStatic]
+    private static Stack<ContinuationLoopContext>? continuationLoopContexts;
+
+    internal static bool ModExpPrefix(ElementContainer __instance, int ele, ref float a, bool chain, out ModExpState __state)
+    {
+        __state = new ModExpState();
+        float originalRaw = a;
+
+        LogState(tag: "ModExpPrefix", __instance: __instance, ele: ele, a: originalRaw, chain: chain);
+
+        if (a <= 0f)
         {
-            var codeMatcher = new CodeMatcher(instructions: instructions);
-
-            bool enableExpScaling = NoGainExpLimitConfig.EnableExpScaling?.Value ?? true;
-            
-            if (enableExpScaling == true)
-            {
-                codeMatcher.MatchStartForward(matches: new[]
-                {
-                    new CodeMatch(opcode: OpCodes.Ldc_I4_0),       // Load constant 0
-                    new CodeMatch(opcode: OpCodes.Ldloc_0),        // Load element
-                    new CodeMatch(opcode: OpCodes.Callvirt, operand: typeof(Element).GetMethod(name: "get_ExpToNext")),  // Get ExpToNext
-                    new CodeMatch(opcode: OpCodes.Ldc_I4_2),       // Load constant 2
-                    new CodeMatch(opcode: OpCodes.Div),            // Divide ExpToNext by 2
-                    new CodeMatch(opcode: OpCodes.Call, operand: typeof(Mathf).GetMethod(name: "Clamp", types: new[] { typeof(int), typeof(int), typeof(int) })), // Mathf.Clamp call
-                });
-                
-                if (codeMatcher.IsValid)
-                {
-                    codeMatcher.RemoveInstructions(count: 6);
-                }
-            }
-
-            if (enableExpScaling == false)
-            {
-                codeMatcher.MatchStartForward(matches: new[]
-                {
-                    new CodeMatch(opcode: OpCodes.Ldc_I4_2),  // Load constant 2
-                    new CodeMatch(opcode: OpCodes.Div),       // Divide operation
-                    new CodeMatch(opcode: OpCodes.Ldc_I4_0),  // Load constant 0
-                    new CodeMatch(opcode: OpCodes.Ldloc_0),   // Load local variable 0
-                    new CodeMatch(opcode: OpCodes.Callvirt, operand: typeof(Element).GetMethod(name: "get_ExpToNext")),  // Call get_ExpToNext()
-                    new CodeMatch(opcode: OpCodes.Ldc_I4_2),  // Load constant 2
-                    new CodeMatch(opcode: OpCodes.Div),       // Divide operation
-                    new CodeMatch(opcode: OpCodes.Call, operand: typeof(Mathf).GetMethod(name: "Clamp", types: new[] { typeof(int), typeof(int), typeof(int) })) // Mathf.Clamp()
-                });
-                
-                if (codeMatcher.IsValid)
-                {
-                    codeMatcher.RemoveInstructions(count: 8);
-                }
-            }
-            
-            return codeMatcher.Instructions();
+            return true;
         }
 
-        internal static void ModExpPostfix(ElementContainer __instance, int ele, float a, bool chain)
+        if (__instance.Card != null && __instance.Card.isChara && __instance.Card.Chara.isDead)
         {
-            Element element = __instance.GetElement(id: ele);
-
-            if (element == null || !element.CanGainExp)
-            {
-                return;
-            }
-
-            bool enableOptimization = NoGainExpLimitConfig.EnableOptimization?.Value ?? false;
-
-            if (enableOptimization == false)
-            {
-                if (element.vExp >= element.ExpToNext)
-                {
-                    int expToNext = element.ExpToNext;
-                    int rawForOneLevel = GetRawForOneLevel(element: element, expToNext: expToNext);
-
-                    int bank = Mathf.Min(a: element.vExp, b: rawForOneLevel);
-                    int remainingRaw = element.vExp - bank;
-
-                    element.vExp = remainingRaw;
-
-                    if (bank > 0)
-                    {
-                        float nextA = bank;
-                        __instance.ModExp(ele: ele, a: nextA, chain: chain);
-                    }
-                }
-
-                return;
-            }
-
-            bool enableExpScaling = NoGainExpLimitConfig.EnableExpScaling?.Value ?? true;
-
-            int originalBase = element.vBase;
-            int totalLevelsGained = 0;
-
-            int remaining2 = element.vExp;
-            element.vExp = 0;
-
-            while (remaining2 > 0)
-            {
-                int expToNext = element.ExpToNext;
-                int rawForOneLevel = GetRawForOneLevel(element: element, expToNext: expToNext);
-
-                if (remaining2 < rawForOneLevel)
-                {
-                    float localA = remaining2;
-
-                    if (element.UseExpMod)
-                    {
-                        int potential = element.UsePotential ? element.Potential : 100;
-                        int clampedPotential = Mathf.Clamp(value: potential, min: 10, max: 1000);
-                        int denom = 100 + Mathf.Max(a: 0, b: element.ValueWithoutLink) * 25;
-
-                        localA = localA * clampedPotential / denom;
-
-                        if (EClass.rndf(a: 1f) < localA % 1f)
-                        {
-                            localA += 1f;
-                        }
-                    }
-
-                    int gain = Mathf.FloorToInt(f: localA);
-                    element.vExp = Mathf.Min(a: gain, b: expToNext - 1);
-                    break;
-                }
-
-                remaining2 -= rawForOneLevel;
-                __instance.ModBase(ele: ele, v: 1);
-                totalLevelsGained += 1;
-
-                if (enableExpScaling == true && remaining2 > 0)
-                {
-                    remaining2 /= 2;
-                }
-
-                if (element.vTempPotential > 0)
-                {
-                    element.vTempPotential -= element.vTempPotential / 4 + EClass.rnd(a: 5) + 5;
-                    if (element.vTempPotential < 0)
-                    {
-                        element.vTempPotential = 0;
-                        break;
-                    }
-                }
-                else if (element.vTempPotential < 0)
-                {
-                    element.vTempPotential += -element.vTempPotential / 4 + EClass.rnd(a: 5) + 5;
-                    if (element.vTempPotential > 0)
-                    {
-                        element.vTempPotential = 0;
-                        break;
-                    }
-                }
-            }
-
-            if (totalLevelsGained > 0)
-            {
-                __instance.OnLevelUp(e: element, lastValue: originalBase);
-            }
+            return true;
         }
-        
-        private static int GetRawForOneLevel(Element element, int expToNext)
+
+        Element element = __instance.GetElement(id: ele);
+        if (element == null || !element.CanGainExp)
+        {
+            return true;
+        }
+
+        bool useLevelUpPresentationSuppression = NoGainExpLimitConfig.EnableLevelUpPresentationSuppression.Value;
+
+        int remainingExpToNext = Mathf.Max(0, element.ExpToNext - element.vExp);
+        int rawExpToNext = GetRawExpNeededForNextLevel(__instance: __instance, element: element, remainingExpToNext: remainingExpToNext, chain: chain);
+
+        if (rawExpToNext > 0 && a > rawExpToNext)
+        {
+            __state.RemainingRaw = a - rawExpToNext;
+            if (useLevelUpPresentationSuppression == true)
+            {
+                __state.EnteredPresentationSuppressionScope = true;
+                EnterPresentationSuppressionScope();
+            }
+
+            a = rawExpToNext;
+        }
+
+        return true;
+    }
+
+    internal static void ModExpPostfix(ElementContainer __instance, int ele, float a, bool chain, ModExpState __state)
+    {
+        LogState(tag: "ModExpPostfix", __instance: __instance, ele: ele, a: a, chain: chain);
+
+        bool useVanillaOverflowReduction = NoGainExpLimitConfig.EnableVanillaOverflowReduction.Value;
+        float remainingRaw = __state.RemainingRaw;
+
+        if (useVanillaOverflowReduction == true)
+        {
+            remainingRaw /= 2f;
+        }
+
+        if (remainingRaw <= 0.0001f)
+        {
+            CleanupPresentationSuppressionScope(__state: __state);
+            return;
+        }
+
+        if (IsOptimizationEnabled() == false)
+        {
+            try
+            {
+                __instance.ModExp(ele: ele, a: remainingRaw, chain: chain);
+            }
+            finally
+            {
+                CleanupPresentationSuppressionScope(__state: __state);
+            }
+
+            return;
+        }
+
+        if (TryCaptureContinuation(__instance: __instance, ele: ele, chain: chain, remainingRaw: remainingRaw) == true)
+        {
+            CleanupPresentationSuppressionScope(__state: __state);
+            return;
+        }
+
+        try
+        {
+            RunContinuationLoop(__instance: __instance, ele: ele, chain: chain, initialRaw: remainingRaw);
+        }
+        finally
+        {
+            CleanupPresentationSuppressionScope(__state: __state);
+        }
+    }
+
+    internal static bool OnLevelUpPrefix(out bool enteredScope)
+    {
+        if (presentationSuppressionScopeDepth <= 0)
+        {
+            enteredScope = false;
+            return true;
+        }
+
+        onLevelUpDepth++;
+        enteredScope = true;
+        return true;
+    }
+
+    internal static void OnLevelUpPostfix(bool enteredScope)
+    {
+        if (enteredScope == false)
+        {
+            return;
+        }
+
+        if (onLevelUpDepth > 0)
+        {
+            onLevelUpDepth--;
+        }
+    }
+
+    internal static bool ShouldSuppressOnLevelUpPresentation()
+    {
+        return presentationSuppressionScopeDepth > 0 && onLevelUpDepth > 0;
+    }
+
+    private static void LogState(string tag, ElementContainer __instance, int ele, float a, bool chain)
+    {
+        Element element = __instance.GetElement(id: ele);
+
+        if (element == null)
+        {
+            NoGainExpLimit.LogInfo($"[{tag}] ele={ele}, a={a}, chain={chain}, element=null");
+            return;
+        }
+
+        int remainingExpToNext = Mathf.Max(0, element.ExpToNext - element.vExp);
+        int rawExpToNext = GetRawExpNeededForNextLevel(__instance: __instance, element: element, remainingExpToNext: remainingExpToNext, chain: chain);
+
+        NoGainExpLimit.LogInfo(
+            $"[{tag}] ele={ele}, a={a}, chain={chain}, canGainExp={element.CanGainExp}, " +
+            $"vExp={element.vExp}, expToNext={element.ExpToNext}, remainingExpToNext={remainingExpToNext}, rawExpToNext={rawExpToNext}, " +
+            $"vBase={element.vBase}, valueWithoutLink={element.ValueWithoutLink}, potential={element.Potential}, " +
+            $"usePotential={element.UsePotential}, useExpMod={element.UseExpMod}, vTempPotential={element.vTempPotential}");
+    }
+
+    private static int GetRawExpNeededForNextLevel(ElementContainer __instance, Element element, int remainingExpToNext, bool chain)
+    {
+        if (remainingExpToNext <= 0)
+        {
+            return 0;
+        }
+
+        float multiplier = 1f;
+
+        if (!chain && __instance.Card != null && __instance.Card.isChara)
+        {
+            multiplier *= __instance.Card.Chara.GetDaysTogetherBonus() / 100f;
+        }
+
+        if (element.UseExpMod)
         {
             int potential = element.UsePotential ? element.Potential : 100;
             int clampedPotential = Mathf.Clamp(value: potential, min: 10, max: 1000);
-            int denom = 100 + Mathf.Max(a: 0, b: element.ValueWithoutLink) * 25;
+            int denominator = 100 + Mathf.Max(a: 0, b: element.ValueWithoutLink) * 25;
+            multiplier *= (float)clampedPotential / denominator;
+        }
 
-            if (element.UseExpMod)
+        if (multiplier <= 0f)
+        {
+            return int.MaxValue;
+        }
+
+        return Mathf.CeilToInt(f: remainingExpToNext / multiplier);
+    }
+
+    private static bool IsOptimizationEnabled()
+    {
+        return NoGainExpLimitConfig.EnableOptimization.Value;
+    }
+
+    private static void RunContinuationLoop(ElementContainer __instance, int ele, bool chain, float initialRaw)
+    {
+        ContinuationLoopContext context = new ContinuationLoopContext
+        {
+            Container = __instance,
+            ElementId = ele,
+            Chain = chain
+        };
+
+        PushContinuationLoopContext(context: context);
+
+        try
+        {
+            float nextRaw = initialRaw;
+
+            while (nextRaw > 0.0001f)
             {
-                return Mathf.CeilToInt(f: (float)expToNext * denom / clampedPotential);
+                context.PendingRaw = 0f;
+                context.HasPending = false;
+
+                __instance.ModExp(ele: ele, a: nextRaw, chain: chain);
+
+                if (context.HasPending == false)
+                {
+                    break;
+                }
+
+                nextRaw = context.PendingRaw;
+            }
+        }
+        finally
+        {
+            PopContinuationLoopContext();
+        }
+    }
+
+    private static bool TryCaptureContinuation(ElementContainer __instance, int ele, bool chain, float remainingRaw)
+    {
+        ContinuationLoopContext? context = FindContinuationLoopContext(__instance: __instance, ele: ele, chain: chain);
+        if (context == null)
+        {
+            return false;
+        }
+
+        context.PendingRaw += remainingRaw;
+        context.HasPending = true;
+        return true;
+    }
+
+    private static ContinuationLoopContext? FindContinuationLoopContext(ElementContainer __instance, int ele, bool chain)
+    {
+        if (continuationLoopContexts == null || continuationLoopContexts.Count <= 0)
+        {
+            return null;
+        }
+
+        foreach (ContinuationLoopContext context in continuationLoopContexts)
+        {
+            if (ReferenceEquals(context.Container, __instance) == false)
+            {
+                continue;
             }
 
-            return expToNext;
+            if (context.ElementId != ele)
+            {
+                continue;
+            }
+
+            if (context.Chain != chain)
+            {
+                continue;
+            }
+
+            return context;
+        }
+
+        return null;
+    }
+
+    private static void PushContinuationLoopContext(ContinuationLoopContext context)
+    {
+        if (continuationLoopContexts == null)
+        {
+            continuationLoopContexts = new Stack<ContinuationLoopContext>();
+        }
+
+        continuationLoopContexts.Push(item: context);
+    }
+
+    private static void PopContinuationLoopContext()
+    {
+        if (continuationLoopContexts == null || continuationLoopContexts.Count <= 0)
+        {
+            return;
+        }
+
+        continuationLoopContexts.Pop();
+
+        if (continuationLoopContexts.Count <= 0)
+        {
+            continuationLoopContexts = null;
+        }
+    }
+
+    private static void CleanupPresentationSuppressionScope(ModExpState __state)
+    {
+        if (__state.EnteredPresentationSuppressionScope == false)
+        {
+            return;
+        }
+
+        ExitPresentationSuppressionScope();
+    }
+
+    private static void EnterPresentationSuppressionScope()
+    {
+        presentationSuppressionScopeDepth++;
+    }
+
+    private static void ExitPresentationSuppressionScope()
+    {
+        if (presentationSuppressionScopeDepth > 0)
+        {
+            presentationSuppressionScopeDepth--;
         }
     }
 }
