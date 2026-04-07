@@ -158,14 +158,14 @@ internal static class ElementContainerPatch
 
         if (element == null)
         {
-            NoGainExpLimit.LogInfo($"[{tag}] ele={ele}, a={a}, chain={chain}, element=null");
+            NoGainExpLimit.LogDebug(message: $"[{tag}] ele={ele}, a={a}, chain={chain}, element=null");
             return;
         }
 
         int remainingExpToNext = Mathf.Max(0, element.ExpToNext - element.vExp);
         int rawExpToNext = GetRawExpNeededForNextLevel(__instance: __instance, element: element, remainingExpToNext: remainingExpToNext, chain: chain);
 
-        NoGainExpLimit.LogInfo(
+        NoGainExpLimit.LogDebug(
             $"[{tag}] ele={ele}, a={a}, chain={chain}, canGainExp={element.CanGainExp}, " +
             $"vExp={element.vExp}, expToNext={element.ExpToNext}, remainingExpToNext={remainingExpToNext}, rawExpToNext={rawExpToNext}, " +
             $"vBase={element.vBase}, valueWithoutLink={element.ValueWithoutLink}, potential={element.Potential}, " +
