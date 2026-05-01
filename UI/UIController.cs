@@ -26,10 +26,18 @@ public static class UIController
         {
             controller.SetPreBuildWithXml(xml: File.ReadAllText(path: NoGainExpLimitConfig.XmlPath));
         }
+        else
+        {
+            NoGainExpLimit.LogError(message: $"Mod Options XML not found: {xmlPath}");
+        }
 
         if (File.Exists(path: NoGainExpLimitConfig.TranslationXlsxPath))
         {
             controller.SetTranslationsFromXslx(path: NoGainExpLimitConfig.TranslationXlsxPath);
+        }
+        else
+        {
+            NoGainExpLimit.LogError(message: $"Mod Options translations not found: {xlsxPath}");
         }
 
         RegisterEvents(controller: controller);
@@ -40,37 +48,34 @@ public static class UIController
         controller.OnBuildUI += builder =>
         {
             var enableVanillaOverflowReductionToggle = GetRequiredPreBuild<OptToggle>(builder: builder, id: "enableVanillaOverflowReductionToggle");
-            if (enableVanillaOverflowReductionToggle == null)
+            if (enableVanillaOverflowReductionToggle != null)
             {
-                return;
+                enableVanillaOverflowReductionToggle.Checked = NoGainExpLimitConfig.EnableVanillaOverflowReduction.Value;
+                enableVanillaOverflowReductionToggle.OnValueChanged += isChecked =>
+                {
+                    NoGainExpLimitConfig.EnableVanillaOverflowReduction.Value = isChecked;
+                };
             }
-            enableVanillaOverflowReductionToggle.Checked = NoGainExpLimitConfig.EnableVanillaOverflowReduction.Value;
-            enableVanillaOverflowReductionToggle.OnValueChanged += isChecked =>
-            {
-                NoGainExpLimitConfig.EnableVanillaOverflowReduction.Value = isChecked;
-            };
             
             var enableOptimizationToggle = GetRequiredPreBuild<OptToggle>(builder: builder, id: "enableOptimizationToggle");
-            if (enableOptimizationToggle == null)
+            if (enableOptimizationToggle != null)
             {
-                return;
+                enableOptimizationToggle.Checked = NoGainExpLimitConfig.EnableOptimization.Value;
+                enableOptimizationToggle.OnValueChanged += isChecked =>
+                {
+                    NoGainExpLimitConfig.EnableOptimization.Value = isChecked;
+                };
             }
-            enableOptimizationToggle.Checked = NoGainExpLimitConfig.EnableOptimization.Value;
-            enableOptimizationToggle.OnValueChanged += isChecked =>
-            {
-                NoGainExpLimitConfig.EnableOptimization.Value = isChecked;
-            };
             
             var enableLevelUpPresentationSuppressionToggle = GetRequiredPreBuild<OptToggle>(builder: builder, id: "enableLevelUpPresentationSuppressionToggle");
-            if (enableLevelUpPresentationSuppressionToggle == null)
+            if (enableLevelUpPresentationSuppressionToggle != null)
             {
-                return;
+                enableLevelUpPresentationSuppressionToggle.Checked = NoGainExpLimitConfig.EnableLevelUpPresentationSuppression.Value;
+                enableLevelUpPresentationSuppressionToggle.OnValueChanged += isChecked =>
+                {
+                    NoGainExpLimitConfig.EnableLevelUpPresentationSuppression.Value = isChecked;
+                };
             }
-            enableLevelUpPresentationSuppressionToggle.Checked = NoGainExpLimitConfig.EnableLevelUpPresentationSuppression.Value;
-            enableLevelUpPresentationSuppressionToggle.OnValueChanged += isChecked =>
-            {
-                NoGainExpLimitConfig.EnableLevelUpPresentationSuppression.Value = isChecked;
-            };
         };
     }
 

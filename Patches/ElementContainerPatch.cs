@@ -21,6 +21,13 @@ internal static class ElementContainerPatch
         internal bool HasPending { get; set; }
     }
 
+    internal sealed class PendingModExpContinuationCall
+    {
+        internal ElementContainer Container { get; set; } = null!;
+        internal int ElementId { get; set; }
+        internal bool Chain { get; set; }
+    }
+
     [ThreadStatic]
     private static int presentationSuppressionScopeDepth;
 
@@ -28,11 +35,23 @@ internal static class ElementContainerPatch
     private static int onLevelUpDepth;
 
     [ThreadStatic]
+    private static Stack<PendingModExpContinuationCall>? pendingModExpContinuationCalls;
+
+    [ThreadStatic]
     private static Stack<ContinuationLoopContext>? continuationLoopContexts;
+
+    internal static bool IsModExpContinuationCall
+    {
+        get
+        {
+            return pendingModExpContinuationCalls != null && pendingModExpContinuationCalls.Count > 0;
+        }
+    }
 
     internal static bool ModExpPrefix(ElementContainer __instance, int ele, ref float a, bool chain, out ModExpState __state)
     {
         __state = new ModExpState();
+        ConsumePendingModExpContinuationCall(__instance: __instance, ele: ele, chain: chain);
         float originalRaw = a;
 
         LogState(tag: "ModExpPrefix", __instance: __instance, ele: ele, a: originalRaw, chain: chain);
@@ -95,7 +114,7 @@ internal static class ElementContainerPatch
         {
             try
             {
-                __instance.ModExp(ele: ele, a: remainingRaw, chain: chain);
+                RunContinuationModExp(__instance: __instance, ele: ele, raw: remainingRaw, chain: chain);
             }
             finally
             {
@@ -227,7 +246,7 @@ internal static class ElementContainerPatch
                 context.PendingRaw = 0f;
                 context.HasPending = false;
 
-                __instance.ModExp(ele: ele, a: nextRaw, chain: chain);
+                RunContinuationModExp(__instance: __instance, ele: ele, raw: nextRaw, chain: chain);
 
                 if (context.HasPending == false)
                 {
@@ -254,6 +273,19 @@ internal static class ElementContainerPatch
         context.PendingRaw += remainingRaw;
         context.HasPending = true;
         return true;
+    }
+
+    private static void RunContinuationModExp(ElementContainer __instance, int ele, float raw, bool chain)
+    {
+        PendingModExpContinuationCall pendingCall = PushPendingModExpContinuationCall(__instance: __instance, ele: ele, chain: chain);
+        try
+        {
+            __instance.ModExp(ele: ele, a: raw, chain: chain);
+        }
+        finally
+        {
+            RemovePendingModExpContinuationCall(pendingCall: pendingCall);
+        }
     }
 
     private static ContinuationLoopContext? FindContinuationLoopContext(ElementContainer __instance, int ele, bool chain)
@@ -332,5 +364,88 @@ internal static class ElementContainerPatch
         {
             presentationSuppressionScopeDepth--;
         }
+    }
+
+    private static PendingModExpContinuationCall PushPendingModExpContinuationCall(ElementContainer __instance, int ele, bool chain)
+    {
+        if (pendingModExpContinuationCalls == null)
+        {
+            pendingModExpContinuationCalls = new Stack<PendingModExpContinuationCall>();
+        }
+
+        PendingModExpContinuationCall pendingCall = new PendingModExpContinuationCall
+        {
+            Container = __instance,
+            ElementId = ele,
+            Chain = chain
+        };
+
+        pendingModExpContinuationCalls.Push(item: pendingCall);
+        return pendingCall;
+    }
+
+    private static void ConsumePendingModExpContinuationCall(ElementContainer __instance, int ele, bool chain)
+    {
+        PendingModExpContinuationCall? pendingCall = PeekPendingModExpContinuationCall();
+        if (pendingCall == null)
+        {
+            return;
+        }
+
+        if (IsMatchingPendingModExpContinuationCall(pendingCall: pendingCall, __instance: __instance, ele: ele, chain: chain) == false)
+        {
+            return;
+        }
+
+        pendingModExpContinuationCalls!.Pop();
+        if (pendingModExpContinuationCalls.Count <= 0)
+        {
+            pendingModExpContinuationCalls = null;
+        }
+    }
+
+    private static void RemovePendingModExpContinuationCall(PendingModExpContinuationCall pendingCall)
+    {
+        PendingModExpContinuationCall? currentPendingCall = PeekPendingModExpContinuationCall();
+        if (ReferenceEquals(currentPendingCall, pendingCall) == false)
+        {
+            return;
+        }
+
+        pendingModExpContinuationCalls!.Pop();
+        if (pendingModExpContinuationCalls.Count <= 0)
+        {
+            pendingModExpContinuationCalls = null;
+        }
+    }
+
+    private static PendingModExpContinuationCall? PeekPendingModExpContinuationCall()
+    {
+        if (pendingModExpContinuationCalls == null || pendingModExpContinuationCalls.Count <= 0)
+        {
+            return null;
+        }
+
+        return pendingModExpContinuationCalls.Peek();
+    }
+
+    private static bool IsMatchingPendingModExpContinuationCall(PendingModExpContinuationCall pendingCall, ElementContainer __instance, int ele, bool chain)
+    {
+        if (ReferenceEquals(pendingCall.Container, __instance) == false)
+        {
+            return false;
+        }
+
+        if (pendingCall.ElementId != ele)
+        {
+            return false;
+        }
+
+        if (pendingCall.Chain != chain)
+        {
+            return false;
+        }
+
+        return true;
     }
 }

@@ -9,7 +9,7 @@ internal static class ModInfo
 {
     internal const string Guid = "omegaplatinum.elin.nogainexplimit";
     internal const string Name = "No Gain Exp Limit";
-    internal const string Version = "2.0.0";
+    internal const string Version = "2.1.0";
     internal const string ModOptionsGuid = "evilmask.elinplugins.modoptions";
 }
 

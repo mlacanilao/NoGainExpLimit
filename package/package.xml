@@ -21,6 +21,8 @@
 
     [h1] Compatibility [/h1]
     This mod works with existing save files.
+    For mod authors, this mod exposes a small compatibility API so EXP multiplier mods can avoid multiplying leftover EXP continuation steps more than once.
+    [code] if (NoGainExpLimit.NoGainExpLimitApi.IsModExpContinuationCall) return; [/code]
 
     [h1] Requirements [/h1]
     This mod requires the [b]Mod Options[/b] mod only for accessing the Config menu. The core functionality of this mod will still work without it. Please subscribe to the [b]Mod Options[/b] mod for menu-based configuration:
@@ -52,7 +54,7 @@
     [h1] Configuration File Location [/h1]
     [code] Steam\steamapps\common\Elin\BepInEx\config\omegaplatinum.elin.nogainexplimit.cfg [/code]
 
-    [img] https://img.shields.io/badge/Supports%20Game%20Version-EA%2023.287%20Stable-green [/img]
+    [img] https://img.shields.io/badge/Supports%20Game%20Version-EA%2023.295%20Stable-green [/img]
 
     [h1] 注意 [/h1]
     このMODは経験値倍率や基本経験値の値を変更するものではありません。
@@ -70,6 +72,8 @@
 
     [h1] 互換性 [/h1]
     このMODは既存のセーブデータと互換性があります。
+    MOD作者向けに、EXP倍率MODが残りEXPの継続処理へ重複して倍率を適用しないための小さな互換APIを提供しています。
+    [code] if (NoGainExpLimit.NoGainExpLimitApi.IsModExpContinuationCall) return; [/code]
 
     [h1] 必須MOD [/h1]
     このMODで [b]Mod Options[/b] MOD が必要なのは Config メニューへアクセスする場合だけです。主要な機能はこれがなくても動作します。メニューから設定したい場合は、以下の [b]Mod Options[/b] MOD を利用してください。
@@ -101,9 +105,9 @@
     [h1] 設定ファイルの場所 [/h1]
     [code] Steam\steamapps\common\Elin\BepInEx\config\omegaplatinum.elin.nogainexplimit.cfg [/code]
 
-    [img] https://img.shields.io/badge/対応ゲームバージョン-EA%2023.287%20Stable-green [/img]
+    [img] https://img.shields.io/badge/対応ゲームバージョン-EA%2023.295%20Stable-green [/img]
   </description>
   <tags>General, Balance, QoL</tags>
   <visibility>Public</visibility>
-  <version>0.23.287</version>
+  <version>0.23.295</version>
 </Meta>
