@@ -23,7 +23,7 @@
     This mod works with existing save files.
     Compatible EXP multiplier mod:
     [list]
-    [*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3717854954]Omega's Experience Multiplier[/url]
+    [*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3717854954]https://steamcommunity.com/sharedfiles/filedetails/?id=3717854954[/url]
     [/list]
     For mod authors, this mod exposes a small compatibility API so EXP multiplier mods can avoid multiplying leftover EXP continuation steps more than once.
     [code] if (NoGainExpLimit.NoGainExpLimitApi.IsModExpContinuationCall) return; [/code]
@@ -37,22 +37,20 @@
     [h1] Configuration Variables [/h1]
 
     [h2] Enable Vanilla Overflow Reduction [/h2]
-    Controls whether the current continuation step halves remaining raw EXP after each level-up.
-    If enabled, the remaining raw EXP is divided by 2 before the next continuation step.
-    This greatly reduces repeated multi-level gains from very large EXP gains in a single action and usually feels fairer and closer to vanilla pacing.
-    If disabled, the remaining raw EXP is kept in full for the next continuation step, allowing much larger chained level gains per action.
-    This is the mod's current raw-overflow behavior and is not the same as vanilla's actual adjusted-overflow handling.
+    Halves leftover raw EXP after each level-up continuation step.
+    This greatly reduces repeated multi-level gains from very large EXP in a single action and feels closer to vanilla pacing.
+    This is still an approximation, not vanilla's exact adjusted-overflow behavior.
     [code] Default: true [/code]
 
     [h2] Enable Optimization (Experimental) [/h2]
-    When enabled, very large EXP gains are handled in a more stable way to help avoid crashes during massive chained level-ups.
-    For very large EXP gains in a single action, it is strongly recommended to enable this together with Enable Level-Up Presentation Suppression.
+    Handles very large chained level-ups in a more stable way.
+    For very large EXP gains in a single action, enable this together with Enable Level-Up Presentation Suppression.
     [code] Default: false [/code]
 
     [h2] Enable Level-Up Presentation Suppression [/h2]
-    When enabled, extra level-ups from large EXP gains hide level-up sounds and messages to reduce spam and lag.
+    Hides extra level-up sounds and messages from large EXP gains to reduce spam and lag.
     Actual level-up effects still run normally.
-    For very large EXP gains in a single action, it is strongly recommended to enable this together with Enable Optimization (Experimental).
+    For very large EXP gains in a single action, enable this together with Enable Optimization (Experimental).
     [code] Default: false [/code]
 
     [h1] Configuration File Location [/h1]
@@ -78,7 +76,7 @@
     このMODは既存のセーブデータと互換性があります。
     互換性のあるEXP倍率MOD:
     [list]
-    [*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3717854954]Omega's Experience Multiplier[/url]
+    [*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3717854954]https://steamcommunity.com/sharedfiles/filedetails/?id=3717854954[/url]
     [/list]
     MOD作者向けに、EXP倍率MODが残りEXPの継続処理へ重複して倍率を適用しないための小さな互換APIを提供しています。
     [code] if (NoGainExpLimit.NoGainExpLimitApi.IsModExpContinuationCall) return; [/code]
@@ -92,22 +90,20 @@
     [h1] 設定変数 [/h1]
 
     [h2] Enable Vanilla Overflow Reduction [/h2]
-    各レベルアップ後の継続処理で、残っている生EXPを半分にするかどうかを設定します。
-    有効にすると、次の継続ステップへ進む前に残りの生EXPが2で割られます。
-    これにより、1回の行動で非常に大きなEXPを得た際の連続レベルアップ数を大きく減らし、体感としてはより公平でバニラ寄りになりやすくなります。
-    無効にすると、次の継続ステップへ残りの生EXPがそのまま引き継がれ、1回の行動でより大きな連続レベルアップが発生します。
-    これは現在のMOD側の生EXPベース挙動であり、バニラ本来の調整済みオーバーフロー処理とは同一ではありません。
+    各レベルアップ後の継続処理で、残りの生EXPを半分にします。
+    1回の行動で非常に大きなEXPを得た際の連続レベルアップ数を大きく減らし、バニラ寄りの体感に近づけます。
+    ただし、バニラ本来の調整済みオーバーフロー処理と完全に同じではありません。
     [code] デフォルト: true [/code]
 
     [h2] Enable Optimization (Experimental) [/h2]
-    有効にすると、非常に大きなEXP獲得時の連続レベルアップ処理をより安定させ、極端なケースでのクラッシュ回避に役立ちます。
-    1回の行動で非常に大きなEXPを得る場合は、Enable Level-Up Presentation Suppression と一緒に有効にすることを強く推奨します。
+    非常に大きなEXP獲得時の連続レベルアップ処理をより安定させます。
+    1回の行動で非常に大きなEXPを得る場合は、Enable Level-Up Presentation Suppression と一緒に有効にしてください。
     [code] デフォルト: false [/code]
 
     [h2] Enable Level-Up Presentation Suppression [/h2]
-    有効にすると、大量のEXP獲得で発生する追加の連続レベルアップ時に、レベルアップ音やメッセージを非表示にして表示負荷やラグを軽減します。
+    大量のEXP獲得で発生する追加の連続レベルアップ音やメッセージを抑えます。
     実際のレベルアップ効果は通常どおり適用されます。
-    1回の行動で非常に大きなEXPを得る場合は、Enable Optimization (Experimental) と一緒に有効にすることを強く推奨します。
+    1回の行動で非常に大きなEXPを得る場合は、Enable Optimization (Experimental) と一緒に有効にしてください。
     [code] デフォルト: false [/code]
 
     [h1] 設定ファイルの場所 [/h1]
