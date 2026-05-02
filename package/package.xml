@@ -21,6 +21,10 @@
 
     [h1] Compatibility [/h1]
     This mod works with existing save files.
+    Compatible EXP multiplier mod:
+    [list]
+    [*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3717854954]Omega's Experience Multiplier[/url]
+    [/list]
     For mod authors, this mod exposes a small compatibility API so EXP multiplier mods can avoid multiplying leftover EXP continuation steps more than once.
     [code] if (NoGainExpLimit.NoGainExpLimitApi.IsModExpContinuationCall) return; [/code]
 
@@ -72,6 +76,10 @@
 
     [h1] 互換性 [/h1]
     このMODは既存のセーブデータと互換性があります。
+    互換性のあるEXP倍率MOD:
+    [list]
+    [*][url=https://steamcommunity.com/sharedfiles/filedetails/?id=3717854954]Omega's Experience Multiplier[/url]
+    [/list]
     MOD作者向けに、EXP倍率MODが残りEXPの継続処理へ重複して倍率を適用しないための小さな互換APIを提供しています。
     [code] if (NoGainExpLimit.NoGainExpLimitApi.IsModExpContinuationCall) return; [/code]
 
